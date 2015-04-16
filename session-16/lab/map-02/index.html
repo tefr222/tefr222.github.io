@@ -68,9 +68,9 @@
     <script src="power-plants-assignment.js"></script>
     <script>
         
-        var map = L.map('map', {
-            center: [36,-94],
-            zoom: 4,
+       var map = L.map('map', {
+            center: [37.63, -84.63],
+            zoom: 6,
         });
        
         var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', 
@@ -81,62 +81,65 @@
             maxZoom: 18
         });
         map.addLayer(tiles);
-          // add JavaScript here
-        console.log(plants);
         
-        plants.features.sort(function(a, b) {
-        return b.properties.capacity - a.properties.capacity;
-    });
+        // Begin writing/modifying code for Map 2 here
         
-    L.geoJson(plants, {
-        pointToLayer: function(feature,latlng) {
-             return L.circleMarker(latlng, {
-                 // options go here
-                color: 'green',
-                weight: 2,
-                fillColor: 'red',
-                fillOpacity: .5,
-                radius: getRadius(feature.properties.capacity)
-             });
-            }, 
+        var lexCoords = L.latLng(38.03, -84.5);
         
-        filter: function(feature, layer) {
-            if((feature.properties.capacity <= 500)&&(feature.properties.source["Natural Gas"])){
-                return feature;   
-            }
-        },
-       
-        
-        onEachFeature: function(feature,layer) {
-            var props = feature.properties;
-            var content = "<b>"+props.plant_name+"</b><br>"+
-                    props.capacity.toLocaleString()+" MW<br>";
-            var source = props.source;
-            for(var fuel in source){
-                    content+="<b>"+fuel+"</b>: "+source[fuel].toLocaleString()+" MW<br>";
-            }
-            layer.bindPopup(content); 
+        plants.features.sort(function(a,b) {
+			return b.properties.capacity_mw - a.properties.capacity;
+		});
+               
+        L.geoJson(plants, {
+            pointToLayer: function(feature,latlng) {
+                 return L.circleMarker(latlng, {
+                     color: 'orange',
+                     weight: 1,
+                     fillColor: 'yellow',
+                     fillOpacity: .8,
+                     radius: getRadius(feature.properties.source["Coal"])
+                 });   
+            },
+            filter: function(feature, layer) {
+
+                var featureCoords = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
                 
-            layer.on('mouseover', function() {
-            layer.setStyle({
-                fillColor: 'white'
+                if(lexCoords.distanceTo(featureCoords)/1000 < 400 &&
+                    feature.properties.source["Coal"] && 
+                    feature.properties.capacity < 500) {
+                    return feature;
+                }
+            },
+            onEachFeature: function(feature,layer) {
+                var distance = lexCoords.distanceTo(L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]))/1000;
+                var props = feature.properties;
+                var content = "<b>"+props.plant_name+"</b><br>"+
+                    props.capacity.toLocaleString()+" MW<br>";
+                var source = props.source;
+                for(var fuel in source){
+                    content+="<b>"+fuel+"</b>: "+source[fuel].toLocaleString()+" MW<br>";
+                }
+                content+= "This plant is <b>"+distance.toLocaleString()+" km</b> from Lexington."
+                layer.bindPopup(content); 
+                
+                layer.on('mouseover', function() {
+                    layer.setStyle({
+                        fillColor: 'red'
+                    });
                 });
-            });
-            layer.on('mouseout', function() {
-                layer.setStyle({
-                    fillColor: 'purple'
+                layer.on('mouseout', function() {
+                    layer.setStyle({
+                        fillColor: 'yellow'
                     });
                 });
             }
-        
         }).addTo(map);
-        
+           
         function getRadius(val) {
-            var radius= Math.sqrt(val/Math.PI);
-            return radius * .8;
-        }
-//          
-//    function getRadius(val)
+            var radius = Math.sqrt(val/Math.PI);
+            return radius * .8;   
+        }        
+        
         
     </script>
     

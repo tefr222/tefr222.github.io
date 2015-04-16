@@ -16,18 +16,18 @@ header {
         width: 100%;
         min-width: 800px;
         margin: 0 auto;
-        background: steelblue;
+        background: #1d3cc1;
         padding: 15px 0 20px;
         }
 h1 { 
-        font-family: Dosis, sans-serif;
+        font-family: Impact, sans-serif;
         color: #375671; 
         width: 80%;
         margin: 0 auto;
         color: whitesmoke;
     }
 h2 { 
-        font-family: Dosis, sans-serif;
+        font-family: "Comic Sans MS", sans-serif;
         color: #375671;
         width: 80%;
         margin: 0 auto;
@@ -39,19 +39,19 @@ h2 {
     }
     p { 
         font-size: .9em; 
-        color: #375671; 
+        color: #3a6f36; 
     }
 ul {
         list-style-type: none; 
         font-size: .9em; 
-        color: #375671; 
+        color: #3a6f36; 
         line-height: 1.6em;
     }
 a, a:visited {   
         color: #003d71;
     }
 /* CSS style rules go here! */   
- <section class="project">
+ 
     .project {
         width: 80%;
         min-width: 800px;
@@ -71,48 +71,54 @@ a, a:visited {
         margin-right: 20px;
         border: 2px solid #dddddd;
     }
-    </section>
 </style>
 </head>
 
 <body>
 <header>
     <h1>Geo409 &ndash; 709: Advanced GIS</h1>
-    <h2>Web Mapping at the University of Kentucky</h2>
+    <h2>Web Mapping by Taylor Franklin, University of Kentucky Student</h2>
 </header>
 </body>
-    <section>
-        <a target="_blank" href="map-1/"><image src="images\rsz_map-1.png" alt="Iguana Attack Zone" class="project-image" /></a>
-        <h3><a target="_blank" href="map-1/">US Fictitious Iguanna Attack Zones &ndash; 2014</a></h3>
+    <section class="project">
+         <image src="images\rsz_map-1.png" alt="Iguana Attack Zone" class="project-image" />
+        <h3><a target="_blank" href="map-01/">US Fictitious Iguanna Attack Zones &ndash; 2014</a></h3>
         
         <p>This interactive map allows the user to see fictitious iguanna attack zones in Melbourne, AU.</p>
-        <p>This data allows allows the user to expirement with various locaitons to see if it is safe to visit by taking radii of "knowsn iguana attack locations" and showing the user if a particualr place falls within that zone.</p>
+        <p>This data allows allows the user to expirement with various locaitons to see if it is safe to visit by taking radii of "known iguana attack locations" and showing the user if a particualr place falls within that zone.</p>
         <ul> 
-            <li>See the map: <a href="#">US Unemployment Rates: 2001 &ndash; 2013</a></li>
-            <li>Data Source: <a href="http://www.bls.gov/data/">Bureau of Labor Statistics</a></li>
-            <li>See the <a href="https://github.com/newmapsplus/geo409/tree/master/map-04">code for this map hosted on GitHub</a></li>
+            <li>Learn about <a href="http://www.melbourne.vic.gov.au/Pages/default.aspx">Melbourne.</a></li>
+            <li>See the <a href="https://github.com/tefr222/geo409/blob/master/map-01/index.html">code for this map hosted on GitHub</a></li>
         </ul>
     </section>
-    <section>
-        <a target="_blank" href="map-2/"><image src="images\rsz_map-2.png" alt="Power Plants" class="project-image" /></a>
-        <h3><a target="_blank" href="map-2/">Energy Production in the US &ndash; 2015</a></h3>
+    <section class="project">
+        <image src="images\rsz_map-2.png" alt="Power Plants" class="project-image" />
+        <h3><a target="_blank" href="map-02/">Energy Production in the US &ndash; 2015</a></h3>
         <p>This map allows users to see data on various power plants by fuel source type including some production information.</p>
         <p>This map functions by taking arrays of data and drawing a circly around features of that data that vary by size of production of the power plant. It also allows the user to click on locations.</p>
         <ul> 
-            <li>See the map: <a href="#">US Unemployment Rates: 2001 &ndash; 2013</a></li>
-            <li>Data Source: <a href="http://www.bls.gov/data/">Bureau of Labor Statistics</a></li>
-            <li>See the <a href="https://github.com/newmapsplus/geo409/tree/master/map-04">code for this map hosted on GitHub</a></li>
+            <li><a href="http://energy.gov/">Visit the Department of Energy</a></li>
+            <li>See the <a href="https://github.com/tefr222/geo409/blob/master/map-02/index.html">code for this map hosted on GitHub</a></li>
         </ul>
     </section>
-    <section>
-        <a target="_blank" href="map-3/"><image src="images\rsz_map-3.png" alt="Kentucky Housing" class="project-image" /></a>
-        <h3><a target="_blank" href="map-3/">Housing in the State of Kentucky &ndash; 2015</a></h3>
-        <p>This map allows users to see the various ways people are housed in the state of kentucky.</p>
-        <p>This map allows the user to interact with a user interface to select different data attributes to display different ways of looking at people housing options in Kentucky</p>
+    <section class="project">
+        <image src="images\rsz_map-3.png" alt="Kentucky Housing" class="project-image" />
+        <h3><a target="_blank" href="map-03/">A Comparison of Energy Production &ndash; 2015</a></h3>
+        <p>This map allows users to comare three different types of energy production in the US: Coal, Wind, and Hydro.</p>
+        <p>This map allows the user to look at any combination of wind, hydro, and coal produciton in the us. It also the user to view infomation specific to the plant.</p>
         <ul> 
-            <li>See the map: <a href="#">US Unemployment Rates: 2001 &ndash; 2013</a></li>
-            <li>Data Source: <a href="http://www.bls.gov/data/">Bureau of Labor Statistics</a></li>
-            <li>See the <a href="https://github.com/newmapsplus/geo409/tree/master/map-04">code for this map hosted on GitHub</a></li>
+            <li>See the <a href="http://energy.gov/science-innovation/energy-sources">Learn About Sources of Energy Here</a></li>
+            <li>See the <a href="https://github.com/tefr222/geo409/blob/master/map-03/index.html">code for this map hosted on GitHub</a></li>
+        </ul>
+    </section>
+    <section class="project">
+        <image src="images\rsz_final-project.png" alt="Kentucky Housing" class="project-image" />
+        <h3><a target="_blank" href="final-project/"> Map Coming Soon... &ndash; May 2015 </a></h3>
+        <p>This map will be an informative chlorpleth map of a state.</p>
+        <p>This map will allow the user to communicate with the map using an user interface.</p>
+        <ul> 
+            
+
         </ul>
     </section>
 </html>
