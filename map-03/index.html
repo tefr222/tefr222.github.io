@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Module 12 Lab Practice Template</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: #001323;
+        }
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+        #map {
+            width: 80%;
+            height: 540px;
+            margin: 10px auto;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+        /* Additional style rules go here! */
+        
+        .popup {
+            background: green; 
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Energy Production</h1>
+        <h2>Coal, Wind, and Hydro</h2>
+    </header>
+
+    <div id='map'></div>
+
+    <footer>
+        <p>Map authored by Taylor Franklin</p>
+        <p>This map shows coal, wind, and hydro powered power plants andvtheir capacity.</p>
+        <p>In addition to showing three diffrent kinds of plants this map also allows the user to click one and show all three types of the power plants within 500 km and a double click will show all power plants within 200 km.
+        </p>
+    </footer>
+    <script src="power-plants.js"></script>
+    <script>
+        var options = {
+            center: [36,-94],
+            zoom: 4
+        }
+        var map = L.map('map', options);
+        var tiles = L.tileLayer('http://a{s}.acetate.geoiq.com/tiles/acetate-hillshading/{z}/{x}/{y}.png', {
+            attribution: '&copy;2012 Esri & Stamen, Data from OSM and Natural Earth',
+            subdomains: '0123',
+            minZoom: 2,
+            maxZoom: 18
+        });
+        map.addLayer(tiles);
+        
+        // Begin writing your practice code here
+       console.log(plants);
+      var commonStyles = {
+             weight: 2,
+             stroke: 2,
+             fillOpacity: .2
+        }
+
+        var hydroLayer = L.geoJson(plants, {
+            pointToLayer: function(feature,latlng) {
+                return L.circleMarker(latlng, commonStyles);
+            },
+            filter: function(feature) {
+                if(feature.properties.fuel_source["Hydro"]) {
+                    return feature;
+                }
+            },
+            style: function(feature) {
+                return {
+                    color: '#1f78b4',
+                    fillColor: '#1f78b4',
+                    radius: getRadius(feature.properties.fuel_source["Hydro"])
+                } 
+            } 
+        }).addTo(map);
+        
+;
+
+        var windLayer = L.geoJson(plants, {
+            pointToLayer: function(feature,latlng) {
+                return L.circleMarker(latlng, commonStyles);
+            },
+            filter: function(feature) {
+                if(feature.properties.fuel_source["Wind"]) {
+                    return feature;
+                }
+            },
+            style: function(feature) {
+                return {
+                    color: '#a6cee3',
+                    fillColor: '#a6cee3',
+                    radius: getRadius(feature.properties.fuel_source["Wind"])
+                }
+            }
+        }).addTo(map);
+        
+        
+       
+         var coalLayer = L.geoJson(plants, {
+            pointToLayer: function(feature,latlng) {
+                return L.circleMarker(latlng, commonStyles);
+            },
+            filter: function(feature) {
+                if(feature.properties.fuel_source["Coal"]) {
+                    return feature;
+                }
+            },
+            style: function(feature) {
+                return {
+                    color: '#070505',
+                    fillColor: '#07090a',
+                    radius: getRadius(feature.properties.fuel_source["Coal"])
+                }
+            }
+        }).addTo(map);
+        
+        map.on('click', function(e) {
+        coalLayer.eachLayer(function(layer) {
+            var distance = e.latlng.distanceTo(layer.getLatLng())/1000;
+            var name= layer.feature.properties.plant_name;
+            var fuelSource=layer.feature.properties.fuel_source;
+            console.log(name);
+            if(distance > 500) {
+                layer.setStyle({
+                    stroke: false,
+                    fill: false
+                });  
+            } 
+            
+            else {
+               layer.setStyle({
+                    stroke: true,
+                    fill: true  
+               });  
+               layer.bindPopup("<b>"+name+"</b><br> Coal:"+ fuelSource.toLocaleString() + "I am <b>"+distance.toLocaleString()+ 
+                               "km</b><br> from the click point.");
+            } 
+        });
+    });
+        
+        
+        map.on('click', function(e) {
+        windLayer.eachLayer(function(layer) {
+            var distance = e.latlng.distanceTo(layer.getLatLng())/1000;
+            var name= layer.feature.properties.plant_name;
+            var fuelSource=layer.feature.properties.fuel_source;
+            if(distance > 500) {
+                layer.setStyle({
+                    stroke: false,
+                    fill: false
+                });  
+            } 
+            
+            else {
+               layer.setStyle({
+                    stroke: true,
+                    fill: true  
+               });  
+               layer.bindPopup("<b>"+name+"</b><br> wind:"+ fuelSource.toLocaleString() +"I am <b>"+distance.toLocaleString()+ 
+                               "km</b><br> from the click point.");
+            } 
+        });
+    });
+        
+        map.on('click', function(e) {
+        hydroLayer.eachLayer(function(layer) {
+            var distance = e.latlng.distanceTo(layer.getLatLng())/1000;
+            var name= layer.feature.properties.plant_name;
+            var fuelSource=layer.feature.properties.fuel_source;
+            if(distance > 500) {
+                layer.setStyle({
+                    stroke: false,
+                    fill: false
+                });  
+            } 
+            
+            else {
+               layer.setStyle({
+                    stroke: true,
+                    fill: true  
+               });  
+               layer.bindPopup("<b>"+name+"</b><br> Hydro:"+ fuelSource.toLocaleString() +"I am <b>"+distance.toLocaleString()+ 
+                               "km</b><br> from the click point.");
+            } 
+        });
+    });
+        
+        map.on('dblclick', function(e) {
+        coalLayer.eachLayer(function(layer) {
+            var distance = e.latlng.distanceTo(layer.getLatLng())/1000;
+            var name= layer.feature.properties.plant_name;
+            var fuelSource=layer.feature.properties.fuel_source;
+            if(distance > 200) {
+                layer.setStyle({
+                    stroke: false,
+                    fill: false
+                });  
+            } 
+            
+            else {
+               layer.setStyle({
+                    stroke: true,
+                    fill: true  
+               });  
+               layer.bindPopup("<b>"+name+"</b><br> Coal:"+ fuelSource.toLocaleString() +"I am <b>"+distance.toLocaleString()+ 
+                               "km</b><br> from the click point.");
+            } 
+        });
+    });
+        map.on('dblclick', function(e) {
+        hydroLayer.eachLayer(function(layer) {
+            var distance = e.latlng.distanceTo(layer.getLatLng())/1000;
+            var name= layer.feature.properties.plant_name;
+            var fuelSource=layer.feature.properties.fuel_source;
+            if(distance > 200) {
+                layer.setStyle({
+                    stroke: false,
+                    fill: false
+                });  
+            } 
+            
+            else {
+               layer.setStyle({
+                    stroke: true,
+                    fill: true  
+               });  
+               layer.bindPopup("<b>"+name+"</b><br> Hydro:"+ fuelSource.toLocaleString() +"I am <b>"+distance.toLocaleString()+ 
+                               "km</b><br> from the click point.");
+            } 
+        });
+    });
+        map.on('dblclick', function(e) {
+        windLayer.eachLayer(function(layer) {
+            var distance = e.latlng.distanceTo(layer.getLatLng())/1000;
+            var name= layer.feature.properties.plant_name;
+            var fuelSource=layer.feature.properties.fuel_source;            
+           if(distance > 200) {
+                layer.setStyle({
+                    stroke: false,
+                    fill: false
+                });  
+            } 
+            
+            else {
+               layer.setStyle({
+                    stroke: true,
+                    fill: true  
+               });  
+               
+                layer.bindPopup("<b>"+name+"</b><br> wind"+ fuelSource.toLocaleString() +"I am <b>"+distance.toLocaleString()+ 
+                               "km</b><br> from the click point.");
+            } 
+        });
+    });
+        
+        
+        
+        function getRadius(val) {
+            var radius = Math.sqrt(val/Math.PI);
+            return radius * .8;   
+        }
+        var sourcesLayers = {
+            "<b style='color:#1f78b4'>Hydro</b>": hydroLayer,
+            "<b style='color:#a6cee3'>Wind</b>": windLayer,
+            "<b style='color:#070505'>Coal</b>": coalLayer
+            }
+
+    L.control.layers(null, sourcesLayers, { collapsed:false }).addTo(map);
+        
+   
+       
+           
+        map.doubleClickZoom.disable();
+        
+    </script>
+    
+</body>
+
+</html>

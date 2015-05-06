@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+
+            
+            <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+            <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+            <script src="simple_statistics.js"></script>
+    
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.0/papaparse.min.js"></script>
+            <script src="https://code.jquery.com/jquery-1.11.2.min.js"> </script>
+            <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    
+           
+<head>
+    <meta charset=utf-8 />
+    <title>Module 13 Lab Template</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: #001323;
+        }
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+        #map {
+            width: 960px;
+            height: 540px;
+            margin: 10px auto;
+            background: whitesmoke;
+            border: 2px solid #dddedf;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+        
+        /* ADD YOUR ADDITIONAL STYLE RULES HERE */
+        
+        .legend {
+        padding: 6px 8px;
+        font-size: 1em;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+    }
+    .legend h3 {
+        font-size: 1.1em;
+        font-weight: normal;
+        color: #001323;
+        margin: 0;
+    }
+    .legend li {
+        list-style-type: none;
+        height: 22px;
+    }
+    .legend span {
+        width: 20px;
+        height: 20px;
+        float: left;
+        margin-right: 10px;
+    }
+        #ui-controls {
+        width: 176px;   
+        padding: 8px 15px 8px 15px;
+        background: rgba(75,75,75,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px; 
+        color: whitesmoke;
+    }
+    .year-slider {
+        width: 100%;
+    }
+    .info {
+        padding: 6px 8px;
+        font-size: 1em;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+        text-align: right;   
+    }    
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Map Title</h1>
+        <h2>Beef, Poultry, and Pork</h2>
+    </header>
+<div id='ui-controls'>
+     <label>Choose a data attribute:<br>
+        <select name="protein">
+            <option value="beef_2000" selected>Beef Produced</option>
+            <option value="poultry_2000">Poultry Produced</option> 
+            <option value="pork_2000">Pork Produced</option>
+        </select>
+        </label>
+</div>
+    <div id='map'></div>
+<!--
+    <div id="ui-controls">
+        <input type="range" min="2000", max="2013", 
+                value="2000", step="1" class="year-slider"></input>
+    </div>
+-->
+    <footer>
+        <p>Map authored by Taylor Franklin</p>
+       
+        <p>This interactive map uses data provided by the USDA Economic Research Service and the USDA Foreign Agricultural Service (Global Agricultrual Trade System) to provide a visual map of the precentages of agricultural revenue that beef, poultry, and pork account for by each individual state for the year 2000. This map allowes the user to compare the production of each individual product by state and through a popup window it allows the user to compare the production by each meat type.
+        </p>
+    </footer>
+    
+    
+
+    <script>
+        
+      
+        //Creates a title
+        jQuery("h1").html("Meat Produced by State in 2000");
+        
+        //Options for the map
+        var options = {
+            center: [39, -99],
+            zoom: 4,
+            minZoom: 1,
+            maxZoom: 20,
+            dragging: false,
+            zoomControl: false
+        }
+        //Labels for the ledgend
+        var labels = {
+            "beef_2000": "% Beef of Agricultural Revenue",
+            "poultry_2000": "% Poultry Agricultural Revenue",
+            "pork_2000": "% Pork Agricultural Revenue"
+        }
+        
+        //Creats a variable for the map to be used below
+        var map = L.map('map', options);
+        
+        //creates a global variable
+        var dataLayer,
+            currentYear= "beef_2000"; 
+        
+        //uses json file to draw map lines
+        $.getJSON("us-states.json", function(states) {
+
+            //takes our csv data and sends turns it into a form compatiable with json
+            Papa.parse('ag.csv', {
+                download: true,
+                header: true,
+                complete: function(data) {
+                    processData(states, data); 
+                }
+            });
+        });
+        //This function takes the ag information and puts it with a polygon defined by the json file
+        function processData(states, data) {
+        
+            //Uses a double for loop to join together the features that have the same postal code 
+            for(var state in states.features){
+                var props=states.features[state].properties;
+
+                for(var d in data.data){
+                    if(props.POSTAL==data.data[d].postal){
+                        states.features[state].properties=data.data[d];
+                        break;
+                    }
+                }
+
+            }
+    
+            //Creates a data layer that places the data on the map and assigns some colors
+            dataLayer = L.geoJson(states, {
+                style: function(feature) {
+                    return {
+                        color: '#6f6868',
+                        weight: 1,
+                        fillOpacity: 1,
+                        fillColor: '#1f78b4'
+                    };
+                }          
+            }).addTo(map);
+            //Calls a function that will handel our drop down menu to select the type of protein we want to view
+            ui();
+            //Calls a function that will draw the legend for us
+            drawLegend();
+//        createSliderUI();
+            //calls a function that will add some additional features to our map
+            updateMap();
+            //calls a function that will create the info for our ledgend
+            drawInfo();
+        
+            
+        
+    };
+    //This funciton creates a popup to add additional information by hovering over each state.    
+    function updateMap(){
+        //assigns the getclassbreaks function to a variable
+        var breaks = getClassBreaks();
+        //uses the .eachLayer function to assign a color to make our map a choropleth map
+        dataLayer.eachLayer(function(layer){
+            layer.setStyle({
+                fillColor: getColor(layer.feature.properties[currentYear], breaks)
+            });
+            //this creates a popup that will display the state name and the details about each type of production in that state
+            layer.bindPopup("<b>"+"State:"+layer.feature.properties["NAME"]+"</b>"+ "</br>" +
+                                labels[currentYear] + ": " + (layer.feature.properties[currentYear]).toLocaleString());
+            
+            
+            //allows the map to highlight the boarder of the state in blue when a mouse passes over it.
+            layer.on('mouseover', function() {
+                updateInfo(this); 
+                
+                layer.setStyle({color: 'blue'}).bringToFront();  
+            });
+            //changes the color back to its original color when the mouse leave that area.
+            layer.on('mouseout', function() {
+                layer.setStyle({color: '#6f6868'});
+            });
+            
+        });
+        //when the mouse goes over the state it pops up a window telling about the production in each state.
+        dataLayer.on('mouseover', function() {
+            $(".info").show();
+        });    
+        //removes that window after the mouse moves out of that area so the windows dont get stacked ontop of each other.
+        dataLayer.on('mouseout', function() {
+            $(".info").hide();
+        });
+        
+        
+        //runs though the updateLegend function so that the the new info can be updated.
+        updateLegend(breaks);
+    }
+    //uses the ss.quantile to sort and make an array of the data in five different ranges.     
+    function getClassBreaks(){
+        var values=[];
+        dataLayer.eachLayer(function(layer){
+            values.push(Number(layer.feature.properties[currentYear]));
+        });
+      
+        var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+        return breaks;
+    }
+      //assigns a color to the class breaks just made.  
+    function getColor(d, breaks) {
+//        console.log(breaks);
+        if(d <= breaks[1]) {
+            return '#f1eef6';
+        } else if(d <= breaks[2]) {
+            return '#ffbecb';
+        } else if(d <= breaks[3]) {
+            return '#ff7d7d';
+        } else if(d <= breaks[4]) {
+            return '#ff3c48';
+        } else if(d <= breaks[5]) {
+            return '#ff000f';
+        }
+    }
+    //draws a ledgend in the bottom left corner of the mad fillind the empty div container. 
+        function drawLegend() {
+
+            var legend = L.control({position: 'bottomleft'});
+
+            legend.onAdd = function(map) {
+
+                var div = L.DomUtil.create('div', 'legend');
+
+                return div;
+
+        };
+            //adds map to legend 
+        legend.addTo(map);
+    }
+        
+    //updates the legend with the different classes assigned in the getClassBreaks function   
+    function updateLegend(breaks) {
+    //takes the ledgend and assigns it a title
+        var legend = $('.legend').html("<h3>" + labels[currentYear] + "</h3><ul>"); 
+        //takes the data and makes it a precentage instead of a decimal precentage for the legend. 
+        for (var i = 0; i < breaks.length-1; i++) {
+            var color = getColor(breaks[i + 1], breaks);
+            legend.append('<li><span style="background:' + color + '"></span> ' +
+                (breaks[i]*100).toLocaleString() + ' &mdash; ' + 
+                (breaks[i + 1]*100).toLocaleString() + '</li>');
+        }
+        legend.append("</ul>");
+    }
+        //creates an empty div container for the info panel
+        function drawInfo() {
+            var info = L.control({position: 'topright'});
+            info.onAdd = function(map) {
+                var div = L.DomUtil.create('div', 'info');
+                return div;  
+            }
+        info.addTo(map);
+            $(".info").hide();
+    }   
+        //fills the empty div container to display the the information about the proteins raised in each state. also converts the info from decimal precent to precent.  
+       function updateInfo(layer) {
+           var props = layer.feature.properties;
+           var html = "<h3>"+"State: " +props["name"]+" </h3>"+
+                    "Total Precentage of Beef: <b>"+ (props["beef_2000"]*100)+"</b><br>"+
+                    "Total Precentage of Pork: <b>"+ (props["pork_2000"]*100)+"</b><br>"+
+                    "Total Precentage of Poultry: <b>"+ (props["poultry_2000"]*100)+"</b>"
+        $(".info").html(html);
+           
+    } 
+    //creates the drop down menu that allows the user to select the protein they want to see nationally. 
+        function ui() {
+            var dataView = L.control({position: 'bottomleft'});
+
+            dataView.onAdd = function(map) {
+
+                var controls = L.DomUtil.get('ui-controls');
+                return controls;
+            }   
+
+            dataView.addTo(map);
+             $('select[name="protein"]').change(function() {
+    
+                currentYear = $(this).val();
+                //calls the update map function to run with the new drop down menu.
+                updateMap();
+                
+            });
+    }
+        
+        
+    </script>
+    
+</body>
+
+</html>
